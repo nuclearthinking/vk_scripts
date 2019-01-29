@@ -49,7 +49,7 @@ def str_to_date(birth_date: str) -> datetime.date:
 
 def ban_user(user_id: int):
     vk_api.groups.ban(
-        group_id=-121768940,
+        group_id=121768940,
         owner_id=user_id,
         comment='18+',
         comment_visible=1
@@ -58,7 +58,7 @@ def ban_user(user_id: int):
 
 subscribers_data = list()
 
-access_token = "a4182951f78261722340f0d8c8415f58f8757a6c936b1da6f1d11d15efb06ee684f29e5b5a104ba09f463"
+access_token = "TOKEN"
 session = vk.Session(access_token=access_token)
 vk_api = vk.API(session, v='5.92')
 
