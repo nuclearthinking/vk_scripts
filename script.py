@@ -2,9 +2,9 @@ import datetime
 import time
 from enum import Enum
 
+import click
 import vk
 from vk.exceptions import VkAPIError
-
 
 today = datetime.date.today()
 ADULT_BIRTH_DATE = datetime.date(today.year - 18, today.month, today.day)
@@ -95,7 +95,7 @@ def str_to_date(birth_date: str) -> datetime.date:
     )
 
 
-def main():
+def main(count: int):
     banned_users = fetch_items(vk_api.groups.getBanned, group_id=121768940, count=200)
     subscribers = fetch_items(vk_api.groups.getMembers, group_id='box_review', fields='bdate')
 
@@ -136,5 +136,15 @@ def main():
     print('Done')
 
 
+@click.command()
+@click.option('--count',
+              default=200,
+              type=int,
+              help='Amount of users will be banned at this session, 0 if you want ban all users'
+              )
+def ban(count):
+    click.echo(f'count {count}')
+
+
 if __name__ == '__main__':
-    main()
+    ban()
