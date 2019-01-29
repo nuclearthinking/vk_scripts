@@ -26,12 +26,10 @@ class Status(Enum):
 class Subscriber:
     id: int
     status: Status
-    years: int
 
-    def __init__(self, id: int, status: Status, years: int = None) -> None:
+    def __init__(self, id: int, status: Status) -> None:
         self.id = id
         self.status = status
-        self.years = years
 
     def ban(self):
         try:
@@ -102,33 +100,29 @@ def main():
     subscribers = fetch_items(vk_api.groups.getMembers, group_id='box_review', fields='bdate')
 
     banned_ids = [user['profile']['id'] for user in banned_users if user.get('profile')]
-    subscribers_data = list()
 
+    subscribers_data = list()
     for user in subscribers:
-        id = user.get('id')
+        _id = user.get('id')
         bdate = user.get('bdate')
 
-        if id in banned_ids:
-            print(f'User {id} already banned')
+        if _id in banned_ids:
+            print(f'User {_id} already banned')
             continue
 
         if not bdate:
-            subscribers_data.append(Subscriber(id=id, status=Status.unknown))
+            subscribers_data.append(Subscriber(id=_id, status=Status.unknown))
             continue
 
         if not has_birth_year(bdate):
-            subscribers_data.append(Subscriber(id=id, status=Status.unknown))
+            subscribers_data.append(Subscriber(id=_id, status=Status.unknown))
             continue
 
-        birth_date = str_to_date(bdate)
-        life_span = today - birth_date
-        years = life_span.days // 365
-
-        if years >= 18:
-            subscribers_data.append(Subscriber(id=id, status=Status.is_adult, years=years))
+        if is_adult(str_to_date(bdate)):
+            subscribers_data.append(Subscriber(id=_id, status=Status.is_adult))
             continue
 
-        subscribers_data.append(Subscriber(id=id, status=Status.not_adult, years=years))
+        subscribers_data.append(Subscriber(id=_id, status=Status.not_adult))
 
     children = [sub for sub in subscribers_data if sub.status in [Status.not_adult]]
 
