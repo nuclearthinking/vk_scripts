@@ -47,18 +47,25 @@ def str_to_date(birth_date: str) -> datetime.date:
     )
 
 
+def ban_user(user_id: int):
+    vk_api.groups.ban(
+        group_id=-121768940,
+        owner_id=user_id,
+        comment='18+',
+        comment_visible=1
+    )
+
+
 subscribers_data = list()
 
-access_token = "TOKEN"
+access_token = "a4182951f78261722340f0d8c8415f58f8757a6c936b1da6f1d11d15efb06ee684f29e5b5a104ba09f463"
 session = vk.Session(access_token=access_token)
 vk_api = vk.API(session, v='5.92')
 
-response = vk_api.groups.getMembers(group_id='pleasuretherapy', fields='bdate')
+response = vk_api.groups.getMembers(group_id='box_review', fields='bdate')
 count = response.get('count')
 subscribers = response.get('items')
 offset = len(subscribers)
-
-
 
 for user in subscribers:
     id = user.get('id')
@@ -77,5 +84,12 @@ for user in subscribers:
         continue
 
     subscribers_data.append(Subscriber(id=id, status=Status.not_adult))
+
+children = [sub for sub in subscribers_data if sub.status in [Status.not_adult, Status.unknown]]
+
+for child in children:
+    print(f'Ban user {child.id}')
+    ban_user(child.id)
+
 
 print('break point')
